@@ -26,10 +26,10 @@ public class Main {
         // taskManager.printAllTaskList();
         taskManager.startTask(5);
         taskManager.finishTask(5);
-        //taskManager.printSubtaskForEpic(1); // эпик выполнится вместе с подзадачей
-        taskManager.updateTask(4, "Не ложиться спать", "По-другому не разобраться с наследием");
+        //taskManager.printSubtaskForEpic(4); // эпик выполнится вместе с подзадачей
+        taskManager.updateTask(5, "Не ложиться спать", "По-другому не разобраться с наследием");
         //обновляю задачу, id - обновляемой задачи
-        //taskManager.printSubtaskForEpic(1); // Стаус сменится на NEW, если бы в списке подзадач для эпика
+        //taskManager.printSubtaskForEpic(4); // Стаус сменится на NEW, если бы в списке подзадач для эпика
         // была бы не одна задача, и среди них нашлась та, у которой статус не NEW, то стауст
         // сменился бы на IN_PROGRESS (если останется одна задача со статусом DONE, статус эпика будет = DONE)
         //taskManager.printTaskById(3); // по ID получаю любую задачу

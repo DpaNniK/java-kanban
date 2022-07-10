@@ -4,12 +4,12 @@ import java.util.HashMap;
 
 public class Epic extends Task {
 
-    HashMap<Integer, Subtask> subtaskListForEpic; //лист для хранения подзадач, у каждого эпика свой
+    private final HashMap<Integer, Subtask> subtaskListForEpic; //лист для хранения подзадач, у каждого эпика свой
 
     public Epic(String name, String description) {
         super(name, description);
-        typeOfTask = type.epic;
-        subtaskListForEpic = new HashMap<>();
+        this.typeOfTask = type.epic;
+        this.subtaskListForEpic = new HashMap<>();
     }
 
     public void putSubtaskForEpic(Subtask subtask) { //добавление подзадачи в эпик

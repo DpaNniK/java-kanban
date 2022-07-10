@@ -12,19 +12,19 @@ public class TaskManager {
     private final HashMap<Integer, Epic> epicList;
     private final HashMap<Integer, Subtask> subtaskList;
     private final HashMap<Integer, Task> allTaskList; // один общий список
-    Integer id = 0; // использую для счетчика
-    Integer check = 0; // нужен для приватных методов по работе с подзадачами
+    private static Integer id = 0; // использую для счетчика
+    private Integer numOfSubtaskForEpic = 0; // нужен для приватных методов по работе с подзадачами
     Task task;
     Epic epic;
     Subtask subtask;
     Status status;
 
     public TaskManager() {
-        taskList = new HashMap<>();
-        epicList = new HashMap<>();
-        subtaskList = new HashMap<>();
-        allTaskList = new HashMap<>();
-        status = new Status();
+        this.taskList = new HashMap<>();
+        this.epicList = new HashMap<>();
+        this.subtaskList = new HashMap<>();
+        this.allTaskList = new HashMap<>();
+        this.status = new Status();
     }
 
     public void createNewTask(String name, String description) { //добавляю в оба списка задачу, счетчик увеличиваю
@@ -82,6 +82,7 @@ public class TaskManager {
         epicList.clear();
         subtaskList.clear();
     }
+
     public void deleteTaskById(Integer id) { // метод по удалению задачи по id
         if (allTaskList.containsKey(id)) {
             if (allTaskList.get(id).getClass().equals(epic.getClass())) { // удаление эпика
@@ -183,55 +184,52 @@ public class TaskManager {
     }
 
     public void finishTask(Integer id) { // метод - закончить задачу
-        if (allTaskList.containsKey(id)) {
-            if (checkStatusTask(id)) {
-                if (!allTaskList.get(id).getClass().equals(epic.getClass())) {
-                    if (allTaskList.get(id).getClass().equals(task.getClass())) {
-                        taskList.get(id).finishTask();
-                    } else {
-                        subtaskList.get(id).finishTask();
-                        if (checkStatusSubtaskForEpic(subtaskList.get(id).getIdEpic())) { // проверка, если внутри эпика
-                            epicList.get(subtaskList.get(id).getIdEpic()).finishTask(); // все DONE, то и он DONE
-                        }
-                    }
-                } else {
-                    System.out.println("Стаус эпика изменить нельзя");
+        if (allTaskList.containsKey(id) && checkStatusTask(id)) {
+            if (allTaskList.get(id).getClass().equals(epic.getClass())) {
+                System.out.println("Стаус эпика изменить нельзя");
+            }
+            if (allTaskList.get(id).getClass().equals(task.getClass())) {
+                taskList.get(id).finishTask();
+            }
+            if (allTaskList.get(id).getClass().equals(subtask.getClass())) {
+                subtaskList.get(id).finishTask();
+                if (checkStatusSubtaskForEpic(subtaskList.get(id).getIdEpic())) { // проверка, если внутри эпика
+                    epicList.get(subtaskList.get(id).getIdEpic()).finishTask(); // все DONE, то и он DONE
                 }
-            } else {
-                System.out.println("Невозможно завершить задачу, над которой не начата работа");
             }
         } else {
-            System.out.println("Задачи под таким номером нет");
+            System.out.println("Задачи под таким номером нет или над ней не была начата работа");
         }
     }
+
 
     private boolean checkStatusTask(Integer id) { //проверка, что задача была отмечена, как "IN_PROGRESS"
         return allTaskList.get(id).getStatus().equals(status.taskInProgress); //Из NEW сразу получить "In_Progr." нельзя
     }
 
     private boolean checkStatusSubtaskForEpic(Integer id) { // проверка, что все подзадачи внутри эпика выполнены
-        check = 0;
+        numOfSubtaskForEpic = 0;
         for (Integer num : epicList.get(id).getSubtaskListForEpic().keySet()) {
             if (subtaskList.get(num).getStatus().equals(status.taskDone)) {
-                check++;
+                numOfSubtaskForEpic++;
             }
         }
-        return (check.equals(epicList.get(id).getSubtaskListForEpic().size()));
+        return (numOfSubtaskForEpic.equals(epicList.get(id).getSubtaskListForEpic().size()));
     }
 
     private boolean checkOnLastSubtaskInEpic(Integer id) { // проверка, что в эпике осталась одна подзадача
-        check = 1;
-        return (epicList.get(id).getSubtaskListForEpic().size() == check);
+        numOfSubtaskForEpic = 1;
+        return (epicList.get(id).getSubtaskListForEpic().size() == numOfSubtaskForEpic);
     }
 
     private boolean checkOnNewStatusSubtaskList(Integer id) { // проверка, что все подзадачи имеют статус "NEW"
-        check = 0;
+        numOfSubtaskForEpic = 0;
         for (Integer num : epicList.get(id).getSubtaskListForEpic().keySet()) {
             if (subtaskList.get(num).getTaskStatus().equals(status.taskNew)) {
-                check++;
+                numOfSubtaskForEpic++;
             }
         }
-        return (check.equals(epicList.get(id).getSubtaskListForEpic().size()));
+        return (numOfSubtaskForEpic.equals(epicList.get(id).getSubtaskListForEpic().size()));
     }
 
     private boolean checkOnNullSubtaskListForEpic(Integer id) { // проверка, что в эпике не осталось подзадач

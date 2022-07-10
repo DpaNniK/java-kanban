@@ -7,7 +7,7 @@ public class Main {
         taskManager.createNewEpic("Переехать", "Нужно собрать вещи и сдать ключи");
         taskManager.createNewSubtask("Собрать вещи", "Не забыть утюг", 1);
         taskManager.createNewSubtask("Сдать ключи", "Встреча с хозяином в 15:30", 1);
-        taskManager.createNewEpic("Сделать проект", "Уже спать хочется]");
+        taskManager.createNewEpic("Сделать проект", "Уже спать хочется");
         taskManager.createNewSubtask("Разобраться с наследием", "Уже очень спать хочется", 4);
         taskManager.startTask(0); //пользователь отмечает, что начинает работу над первой задачей
         //taskManager.printTaskList();
@@ -32,6 +32,6 @@ public class Main {
         //taskManager.printSubtaskForEpic(4); // Стаус сменится на NEW, если бы в списке подзадач для эпика
         // была бы не одна задача, и среди них нашлась та, у которой статус не NEW, то стауст
         // сменился бы на IN_PROGRESS (если останется одна задача со статусом DONE, статус эпика будет = DONE)
-        //taskManager.printTaskById(3); // по ID получаю любую задачу
+        //taskManager.printTaskById(5); // по ID получаю любую задачу
     }
 }

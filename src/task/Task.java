@@ -3,15 +3,14 @@ package task;
 public class Task {  //класс-предок для всех задач
     protected String name;
     protected String description;
-    protected String taskStatus;
+    protected Status taskStatus;
     protected String typeOfTask;
     protected Integer id;
-    protected Status status = new Status();
     protected Type type = new Type();
 
 
     public Task(String name, String description) {
-        this.taskStatus = status.taskNew;
+        this.taskStatus = Status.NEW;
         this.name = name;
         this.description = description;
         this.typeOfTask = type.task;
@@ -21,11 +20,11 @@ public class Task {  //класс-предок для всех задач
         this.id = id;
     }
 
-    public void setTaskStatus(String taskStatus) {
+    public void setTaskStatus(Status taskStatus) {
         this.taskStatus = taskStatus;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return this.taskStatus;
     }
 
@@ -38,18 +37,18 @@ public class Task {  //класс-предок для всех задач
     }
 
     public void startTask() {
-        taskStatus = status.taskInProgress;
+        taskStatus = Status.IN_PROGRESS;
     }
 
     public void finishTask() {
-        taskStatus = status.taskDone;
+        taskStatus = Status.DONE;
     }
 
     public void createNewTask() {
-        taskStatus = status.taskNew;
+        taskStatus = Status.NEW;
     }
 
-    public String getTaskStatus() {
+    public Status getTaskStatus() {
         return taskStatus;
     }
 

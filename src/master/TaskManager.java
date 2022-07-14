@@ -28,6 +28,8 @@ public interface TaskManager { //Интерфейс со всеми метода
 
     void updateTask(Integer id, String name, String description);
 
+    Task getTaskById(Integer id);
+
     void printTaskById(Integer id);
 
     void startTask(Integer id);

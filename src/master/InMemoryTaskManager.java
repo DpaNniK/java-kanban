@@ -166,14 +166,20 @@ public class InMemoryTaskManager implements TaskManager { //Методы пре�
         }
     }
 
-    @Override
-    public void printTaskById(Integer id) {
-        if (allTaskList.containsKey(id)) {
-            System.out.println(allTaskList.get(id));
+    @Override //Метод был раньше printTaskById(), изенил его исключительно на универсальный getTaskById()
+    public Task getTaskById(Integer id) { //Пользователь запрашивает получение задачи
+        if (allTaskList.containsKey(id)) { //Происходит проверка, есть ли она в списке
             addTaskInHistory(allTaskList.get(id)); //Просмотренная задача добавляется в список истории
+            return allTaskList.get(id);
         } else {
             System.out.println("Задачи под таким номером нет.");
+            return null;
         }
+    }
+
+    @Override //Метод printTaskById переделал на основе нового геттера
+    public void printTaskById(Integer id) { //Его не просят делать в тз, но я сделал для наглядности, т.к.
+        System.out.println(getTaskById(id)); //Без вывода на экран чего-то мне пока что трудно ориентироваться
     }
 
     @Override

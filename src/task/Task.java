@@ -52,6 +52,11 @@ public class Task {  //класс-предок для всех задач
         return taskStatus;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+
     @Override
     public String toString() { //переобределен мтеод toString для удобного вида println
         return "Task{" +

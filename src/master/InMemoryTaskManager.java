@@ -8,7 +8,7 @@ import task.Task;
 import java.util.HashMap;
 import java.util.List;
 
-public class InMemoryTaskManager implements TaskManager { //Методы прежние, только переопределены
+public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> taskList;
     private final HashMap<Integer, Epic> epicList;
     private final HashMap<Integer, Subtask> subtaskList;
@@ -95,10 +95,12 @@ public class InMemoryTaskManager implements TaskManager { //Методы пре�
         if (allTaskList.containsKey(id)) {
             if (allTaskList.get(id).getClass().equals(epic.getClass())) {
                 for (Integer num : epicList.get(id).getSubtaskListForEpic().keySet()) {
+                    historyManager.remove(num); //удаление подзадач эпика из истории
                     subtaskList.remove(num);
                 }
                 epicList.remove(id);
                 allTaskList.remove(id);
+                historyManager.remove(id); //удаление эпика из истории
             } else if (allTaskList.get(id).getClass().equals(subtask.getClass())) {
                 deleteSubtaskForEpic(subtaskList.get(id).getIdEpic(), subtaskList.get(id));
                 if (checkStatusSubtaskForEpic(subtaskList.get(id).getIdEpic())) {
@@ -123,9 +125,11 @@ public class InMemoryTaskManager implements TaskManager { //Методы пре�
                 }
                 subtaskList.remove(id);
                 allTaskList.remove(id);
+                historyManager.remove(id); // удаление подзадачи из истории
             } else if (allTaskList.get(id).getClass().equals(task.getClass())) {
                 taskList.remove(id);
                 allTaskList.remove(id);
+                historyManager.remove(id); // удаление задачи из истории
             }
         } else {
             System.out.println("Задачи под таким номером нет");
@@ -166,7 +170,7 @@ public class InMemoryTaskManager implements TaskManager { //Методы пре�
         }
     }
 
-    @Override //Метод был раньше printTaskById(), изенил его исключительно на универсальный getTaskById()
+    @Override
     public Task getTaskById(Integer id) { //Пользователь запрашивает получение задачи
         if (allTaskList.containsKey(id)) { //Происходит проверка, есть ли она в списке
             addTaskInHistory(allTaskList.get(id)); //Просмотренная задача добавляется в список истории
@@ -177,9 +181,9 @@ public class InMemoryTaskManager implements TaskManager { //Методы пре�
         }
     }
 
-    @Override //Метод printTaskById переделал на основе нового геттера
-    public void printTaskById(Integer id) { //Его не просят делать в тз, но я сделал для наглядности, т.к.
-        System.out.println(getTaskById(id)); //Без вывода на экран чего-то мне пока что трудно ориентироваться
+    @Override
+    public void printTaskById(Integer id) {
+        System.out.println(getTaskById(id));
     }
 
     @Override
@@ -233,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager { //Методы пре�
     }
 
     private void addTaskInHistory(Task task) { //Добавляем задачу в список истории просмотров
-        historyManager.addTaskInHistory(task);
+        historyManager.add(task);
     }
 
     private boolean checkStatusTask(Integer id) {

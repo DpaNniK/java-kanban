@@ -90,6 +90,12 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskList.clear();
     }
 
+    // В switch-case не получается переделать, т.к. я сраниваю класс полученной задачи с тремя имеющимися классами -
+    // в switch кладу - switch(allTaskList.get(id).getClass()), в case - case task.getClass(), epic.getClass(),
+    // а также subtask.getClass()
+    // в результате чего имею ошибку - Incompatible types. Found: 'java.lang.Class<capture<? extends task.Task>>',
+    // required: 'char, byte, short, int, Character, Byte, Short, Integer, String, or an enum'
+    // Как я понял, switch-case не может сравнивать класс объекта
     @Override
     public void deleteTaskById(Integer id) {
         if (allTaskList.containsKey(id)) {

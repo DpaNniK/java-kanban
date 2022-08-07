@@ -1,9 +1,6 @@
 package master;
 
-import task.Epic;
-import task.Status;
-import task.Subtask;
-import task.Task;
+import task.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +45,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createNewSubtask(String name, String description, Integer idEpic) {
-        if (allTaskList.get(idEpic).getClass().equals(epic.getClass())) {
+        if (allTaskList.get(idEpic).getTypeOfTask().equals(Type.EPIC)) {
             subtask = new Subtask(name, description, idEpic);
             subtask.setId(id);
             subtaskList.put(id, subtask);
@@ -90,6 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskList.clear();
     }
 
+    //Переделано) Выглядит действительно более изящно :) Также поправил другие методы, где использовался getClass()
     @Override
     public void deleteTaskById(Integer id) {
         if (allTaskList.containsKey(id)) {
@@ -145,31 +143,34 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Integer id, String name, String description) {
         if (allTaskList.containsKey(id)) {
-            if (allTaskList.get(id).getClass().equals(subtask.getClass())) {
-                subtask = new Subtask(name, description, subtaskList.get(id).getIdEpic());
-                subtask.setId(id);
-                subtaskList.put(id, subtask);
-                allTaskList.put(id, subtask);
-                addSubtaskInEpic(subtask, subtaskList.get(id).getIdEpic());
-                if (checkOnNewStatusSubtaskList(subtaskList.get(id).getIdEpic())) {
-                    epicList.get(subtaskList.get(id).getIdEpic()).createNewTask();
-                } else {
-                    epicList.get(subtaskList.get(id).getIdEpic()).startTask();
-                }
-            }
-            if (allTaskList.get(id).getClass().equals(task.getClass())) {
-                task = new Task(name, description);
-                task.setId(id);
-                taskList.put(id, task);
-                allTaskList.put(id, task);
-                taskList.get(id).createNewTask();
-            }
+            switch (allTaskList.get(id).getTypeOfTask()) {
+                case SUBTASK:
+                    subtask = new Subtask(name, description, subtaskList.get(id).getIdEpic());
+                    subtask.setId(id);
+                    subtaskList.put(id, subtask);
+                    allTaskList.put(id, subtask);
+                    addSubtaskInEpic(subtask, subtaskList.get(id).getIdEpic());
+                    if (checkOnNewStatusSubtaskList(subtaskList.get(id).getIdEpic())) {
+                        epicList.get(subtaskList.get(id).getIdEpic()).createNewTask();
+                    } else {
+                        epicList.get(subtaskList.get(id).getIdEpic()).startTask();
+                    }
+                    break;
 
-            if (allTaskList.get(id).getClass().equals(epic.getClass())) {
-                epic = new Epic(name, description);
-                epic.setId(id);
-                epicList.put(id, epic);
-                allTaskList.put(id, epic);
+                case TASK:
+                    task = new Task(name, description);
+                    task.setId(id);
+                    taskList.put(id, task);
+                    allTaskList.put(id, task);
+                    taskList.get(id).createNewTask();
+                    break;
+
+                case EPIC:
+                    epic = new Epic(name, description);
+                    epic.setId(id);
+                    epicList.put(id, epic);
+                    allTaskList.put(id, epic);
+                    break;
             }
         } else {
             System.out.println("Задачи под атким номером нет");
@@ -195,8 +196,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void startTask(Integer id) {
         if (allTaskList.containsKey(id)) {
-            if (!allTaskList.get(id).getClass().equals(epic.getClass())) {
-                if (allTaskList.get(id).getClass().equals(task.getClass())) {
+            if (!allTaskList.get(id).getTypeOfTask().equals(Type.EPIC)) {
+                if (allTaskList.get(id).getTypeOfTask().equals(Type.TASK)) {
                     taskList.get(id).startTask();
                 } else {
                     subtaskList.get(id).startTask();
@@ -213,13 +214,13 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void finishTask(Integer id) {
         if (allTaskList.containsKey(id) && checkStatusTask(id)) {
-            if (allTaskList.get(id).getClass().equals(epic.getClass())) {
+            if (allTaskList.get(id).getTypeOfTask().equals(Type.EPIC)) {
                 System.out.println("Стаус эпика изменить нельзя");
             }
-            if (allTaskList.get(id).getClass().equals(task.getClass())) {
+            if (allTaskList.get(id).getTypeOfTask().equals(Type.TASK)) {
                 taskList.get(id).finishTask();
             }
-            if (allTaskList.get(id).getClass().equals(subtask.getClass())) {
+            if (allTaskList.get(id).getTypeOfTask().equals(Type.SUBTASK)) {
                 subtaskList.get(id).finishTask();
                 if (checkStatusSubtaskForEpic(subtaskList.get(id).getIdEpic())) {
                     epicList.get(subtaskList.get(id).getIdEpic()).finishTask();

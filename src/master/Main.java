@@ -33,6 +33,5 @@ public class Main {
         System.out.println("Удаляю эпик с ID = 1. Удалятся все подзадачи и сам эпик. Новая история: ");
         taskManager.deleteTaskById(1);
         taskManager.printHistoryList();
-
     }
 }

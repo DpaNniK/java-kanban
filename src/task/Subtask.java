@@ -6,7 +6,7 @@ public class Subtask extends Epic {
 
     public Subtask(String name, String description, Integer idEpic) {
         super(name, description);
-        typeOfTask = type.subtask;
+        typeOfTask = Type.SUBTASK;
         this.idEpic = idEpic;
     }
 

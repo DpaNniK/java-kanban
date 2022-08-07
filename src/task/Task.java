@@ -4,16 +4,20 @@ public class Task {  //класс-предок для всех задач
     protected String name;
     protected String description;
     protected Status taskStatus;
-    protected String typeOfTask;
+
+    public Type getTypeOfTask() {
+        return typeOfTask;
+    }
+
+    protected Type typeOfTask;
     protected Integer id;
-    protected Type type = new Type();
 
 
     public Task(String name, String description) {
         this.taskStatus = Status.NEW;
         this.name = name;
         this.description = description;
-        this.typeOfTask = type.task;
+        this.typeOfTask = Type.TASK;
     }
 
     public void setId(Integer id) {

@@ -90,52 +90,52 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskList.clear();
     }
 
-    // В switch-case не получается переделать, т.к. я сраниваю класс полученной задачи с тремя имеющимися классами -
-    // в switch кладу - switch(allTaskList.get(id).getClass()), в case - case task.getClass(), epic.getClass(),
-    // а также subtask.getClass()
-    // в результате чего имею ошибку - Incompatible types. Found: 'java.lang.Class<capture<? extends task.Task>>',
-    // required: 'char, byte, short, int, Character, Byte, Short, Integer, String, or an enum'
-    // Как я понял, switch-case не может сравнивать класс объекта
     @Override
     public void deleteTaskById(Integer id) {
         if (allTaskList.containsKey(id)) {
-            if (allTaskList.get(id).getClass().equals(epic.getClass())) {
-                for (Integer num : epicList.get(id).getSubtaskListForEpic().keySet()) {
-                    historyManager.remove(num); //удаление подзадач эпика из истории
-                    subtaskList.remove(num);
-                }
-                epicList.remove(id);
-                allTaskList.remove(id);
-                historyManager.remove(id); //удаление эпика из истории
-            } else if (allTaskList.get(id).getClass().equals(subtask.getClass())) {
-                deleteSubtaskForEpic(subtaskList.get(id).getIdEpic(), subtaskList.get(id));
-                if (checkStatusSubtaskForEpic(subtaskList.get(id).getIdEpic())) {
-                    epicList.get(subtaskList.get(id).getIdEpic()).
-                            setTaskStatus(subtaskList.get(id).getTaskStatus());
-                }
-                if (checkOnNewStatusSubtaskList(subtaskList.get(id).getIdEpic())) {
-                    epicList.get(subtaskList.get(id).getIdEpic()).
-                            setTaskStatus(Status.NEW);
-                }
-                if (checkOnLastSubtaskInEpic(subtaskList.get(id).getIdEpic())) {
-                    epicList.get(subtaskList.get(id).getIdEpic()).
-                            setTaskStatus(getLastStatusOfSubtaskForEpic(subtaskList.get(id).getIdEpic()));
-                }
-                if (checkOnNullSubtaskListForEpic(subtaskList.get(id).getIdEpic())) {
-                    task = new Task(epicList.get(subtaskList.get(id).getIdEpic()).getName(),
-                            epicList.get(subtaskList.get(id).getIdEpic()).getDescription());
-                    task.setId(subtaskList.get(id).getIdEpic());
-                    taskList.put(subtaskList.get(id).getIdEpic(), task);
-                    allTaskList.put(subtaskList.get(id).getIdEpic(), task);
-                    epicList.remove(subtaskList.get(id).getIdEpic());
-                }
-                subtaskList.remove(id);
-                allTaskList.remove(id);
-                historyManager.remove(id); // удаление подзадачи из истории
-            } else if (allTaskList.get(id).getClass().equals(task.getClass())) {
-                taskList.remove(id);
-                allTaskList.remove(id);
-                historyManager.remove(id); // удаление задачи из истории
+            switch (allTaskList.get(id).getTypeOfTask()) {
+                case EPIC:
+                    for (Integer num : epicList.get(id).getSubtaskListForEpic().keySet()) {
+                        historyManager.remove(num); //удаление подзадач эпика из истории
+                        subtaskList.remove(num);
+                    }
+                    epicList.remove(id);
+                    allTaskList.remove(id);
+                    historyManager.remove(id); //удаление эпика из истории
+                    break;
+
+                case SUBTASK:
+                    deleteSubtaskForEpic(subtaskList.get(id).getIdEpic(), subtaskList.get(id));
+                    if (checkStatusSubtaskForEpic(subtaskList.get(id).getIdEpic())) {
+                        epicList.get(subtaskList.get(id).getIdEpic()).
+                                setTaskStatus(subtaskList.get(id).getTaskStatus());
+                    }
+                    if (checkOnNewStatusSubtaskList(subtaskList.get(id).getIdEpic())) {
+                        epicList.get(subtaskList.get(id).getIdEpic()).
+                                setTaskStatus(Status.NEW);
+                    }
+                    if (checkOnLastSubtaskInEpic(subtaskList.get(id).getIdEpic())) {
+                        epicList.get(subtaskList.get(id).getIdEpic()).
+                                setTaskStatus(getLastStatusOfSubtaskForEpic(subtaskList.get(id).getIdEpic()));
+                    }
+                    if (checkOnNullSubtaskListForEpic(subtaskList.get(id).getIdEpic())) {
+                        task = new Task(epicList.get(subtaskList.get(id).getIdEpic()).getName(),
+                                epicList.get(subtaskList.get(id).getIdEpic()).getDescription());
+                        task.setId(subtaskList.get(id).getIdEpic());
+                        taskList.put(subtaskList.get(id).getIdEpic(), task);
+                        allTaskList.put(subtaskList.get(id).getIdEpic(), task);
+                        epicList.remove(subtaskList.get(id).getIdEpic());
+                    }
+                    subtaskList.remove(id);
+                    allTaskList.remove(id);
+                    historyManager.remove(id); // удаление подзадачи из истории
+                    break;
+
+                case TASK:
+                    taskList.remove(id);
+                    allTaskList.remove(id);
+                    historyManager.remove(id); // удаление задачи из истории
+                    break;
             }
         } else {
             System.out.println("Задачи под таким номером нет");

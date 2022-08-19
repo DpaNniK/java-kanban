@@ -21,7 +21,7 @@ public class Main {
         //taskManager.printHistoryList();
         //taskManager.printAllTaskList();
 
-        //Создаю нового менеджера, восстанвливая данные из файла:
+        //Создаю нового менеджера, восстанавливая данные из файла:
         TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file);
         taskManager1.printAllTaskList();
         System.out.println("История просмотров: ");

@@ -60,15 +60,10 @@ public class Task {  //класс-предок для всех задач
         return id;
     }
 
-
     @Override
-    public String toString() { //переобределен мтеод toString для удобного вида println
-        return "Task{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", taskStatus='" + taskStatus + '\'' +
-                ", id=" + id +
-                ", type=" + typeOfTask +
-                '}';
+    public String toString() { //Для Task также переопределен метод вывода в строку
+        return String.format(id + "," +
+                typeOfTask + "," + name + "," +
+                taskStatus + "," + description);
     }
 }

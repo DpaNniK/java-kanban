@@ -11,4 +11,5 @@ public interface HistoryManager { //Интерфейс для работы с и
     void add(Task task);
 
     void remove(int id);
+
 }

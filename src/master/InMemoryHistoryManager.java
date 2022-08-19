@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager { //Класс, реализующий интерфес HistoryManager
-    private List<Task> historyList; // В этом списке будет обновляться история просмотров
+    private static List<Task> historyList; // В этом списке будет обновляться история просмотров
     private final CustomLinkedList<Task> customLinkedList; // Лист, сохраняющий порядок просмотров задач
 
     public InMemoryHistoryManager() {
-        this.historyList = new ArrayList<>();
+        historyList = new ArrayList<>();
         this.customLinkedList = new CustomLinkedList<>();
     }
 
@@ -29,6 +29,32 @@ public class InMemoryHistoryManager implements HistoryManager { //Класс, р
     @Override
     public void remove(int id) { //Метод удаления вызывается при удалении пользователем задачи из списка
         customLinkedList.removeNode(customLinkedList.getNodeById(id)); //Удаление узла из связанного списка
+    }
+
+    //Метод записывает id задач в строку из истории просмотров
+    static String historyToString(HistoryManager manager) {
+        StringBuilder stringBuilder = new StringBuilder();
+        int i = 0;
+        for (Task task : manager.getHistory()) {
+            i++;
+            if (i == historyList.size()) {
+                stringBuilder.append(task.getId());
+            } else {
+                stringBuilder.append(task.getId()).append(",");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    /* Метод возвращает список с id задач из строки истории просмотров через разбитие
+       по символу "," */
+    static List<Integer> historyFromString(String value) {
+        List<Integer> result = new ArrayList<>();
+        String[] historyTaskId = value.split(",");
+        for (String id : historyTaskId) {
+            result.add(Integer.parseInt(id));
+        }
+        return result;
     }
 
     public static class CustomLinkedList<T extends Task> {

@@ -6,14 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> taskList;
-    private final HashMap<Integer, Epic> epicList;
-    private final HashMap<Integer, Subtask> subtaskList;
-    private final HashMap<Integer, Task> allTaskList;
+    protected HashMap<Integer, Task> taskList;
+    protected HashMap<Integer, Epic> epicList;
+    protected HashMap<Integer, Subtask> subtaskList;
+    protected HashMap<Integer, Task> allTaskList;
     HistoryManager historyManager = Managers.getDefaultHistory(); //Создаю объект, хранящий историю, на основе Интерфейса
 
-    private static Integer id = 0;
-    private Integer numOfSubtaskForEpic = 0;
+    private Integer id = 0;
+    protected Integer numOfSubtaskForEpic = 0;
     Task task;
     Epic epic;
     Subtask subtask;
@@ -243,7 +243,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void addTaskInHistory(Task task) { //Добавляем задачу в список истории просмотров
+    protected void addTaskInHistory(Task task) { //Добавляем задачу в список истории просмотров
         historyManager.add(task);
     }
 
@@ -311,4 +311,14 @@ public class InMemoryTaskManager implements TaskManager {
             System.out.println(subtaskList.get(id));
         }
     }
+
+    /* Ниже описан метод для представления task, epic, subtask в виде строки*/
+    protected String allTaskToString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Integer id : allTaskList.keySet()) {
+            stringBuilder.append(allTaskList.get(id).toString()).append("\n");
+        }
+        return stringBuilder.toString();
+    }
+
 }

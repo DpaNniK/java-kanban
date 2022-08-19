@@ -1,6 +1,8 @@
 package master;
 
-public class Managers { //Создаю служебынй класс
+import java.io.File;
+
+public class Managers { //Создаю служебный класс
 
     public static TaskManager getDefault() { //возвращаю объект InMemoryTaskManager
         return new InMemoryTaskManager();
@@ -8,5 +10,9 @@ public class Managers { //Создаю служебынй класс
 
     public static HistoryManager getDefaultHistory() { //возвращаю объект InMemoryHistoryManager
         return new InMemoryHistoryManager();
+    }
+
+    public static TaskManager getFileBackedManager(File file) {
+        return new FileBackedTaskManager(file);
     }
 }

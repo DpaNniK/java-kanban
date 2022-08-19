@@ -13,4 +13,11 @@ public class Subtask extends Epic {
     public Integer getIdEpic() {
         return idEpic;
     }
+
+    @Override
+    public String toString() { //Для Subtask также переопределен метод вывода в строку
+        return String.format(id + "," +
+                typeOfTask + "," + name + "," +
+                taskStatus + "," + description + "," + idEpic);
+    }
 }

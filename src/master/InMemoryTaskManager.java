@@ -2,15 +2,18 @@ package master;
 
 import task.*;
 
-import java.util.HashMap;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     protected HashMap<Integer, Task> taskList;
     protected HashMap<Integer, Epic> epicList;
     protected HashMap<Integer, Subtask> subtaskList;
     protected HashMap<Integer, Task> allTaskList;
-    HistoryManager historyManager = Managers.getDefaultHistory(); //Создаю объект, хранящий историю, на основе Интерфейса
+    HistoryManager historyManager = Managers.getDefaultHistory();
+    Comparator<Task> comparator = Comparator.comparing(Task::getStartTime
+            , Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId);
 
     private Integer id = 0;
     protected Integer numOfSubtaskForEpic = 0;
@@ -45,7 +48,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createNewSubtask(String name, String description, Integer idEpic) {
-        if (allTaskList.get(idEpic).getTypeOfTask().equals(Type.EPIC)) {
+        if (allTaskList.size() != 0 && allTaskList.get(idEpic).getTypeOfTask().equals(Type.EPIC)) {
             subtask = new Subtask(name, description, idEpic);
             subtask.setId(id);
             subtaskList.put(id, subtask);
@@ -53,8 +56,38 @@ public class InMemoryTaskManager implements TaskManager {
             addSubtaskInEpic(subtask, idEpic);
             id++;
         } else {
-            System.out.println("Эпика под таким номером нет");
+            throw new IllegalArgumentException("Эпика под таким номером нет");
         }
+    }
+
+    @Override
+    public void setTimeForTask(int id, String localDateTime, int duration) {
+        if (allTaskList.containsKey(id)) {
+            if (checkThatTimeIsNotInInterval(localDateTime, duration)) {
+                switch (allTaskList.get(id).getTypeOfTask()) {
+                    case EPIC:
+                        throw new IllegalArgumentException(
+                                "Время начала эпика определяется временем старта его ранней подзадачи");
+                    case TASK:
+                        allTaskList.get(id).getEndTime(localDateTime, duration);
+                        break;
+                    case SUBTASK:
+                        Subtask subtask = (Subtask) allTaskList.get(id);
+                        subtask.getEndTime(localDateTime, duration);
+                        Epic epic = (Epic) allTaskList.get(subtask.getIdEpic());
+                        epic.getEndTime(localDateTime, duration);
+                }
+            } else throw new IllegalArgumentException("Время задачи пересекается с временем выполнения другой задачи");
+        } else throw new IllegalArgumentException("Задачи под таким id не найдено");
+    }
+
+    @Override
+    public Set<Task> getPrioritizedTasks() {
+        Set<Task> sortTimeTaskList = new TreeSet<>(comparator);
+        for (int id : allTaskList.keySet()) {
+            sortTimeTaskList.add(allTaskList.get(id));
+        }
+        return sortTimeTaskList;
     }
 
     @Override
@@ -68,14 +101,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void printSubtaskForEpic(Integer id) {
+    public List<Subtask> getSubtaskForEpic(Integer id) {
+        List<Subtask> subtasks = new ArrayList<>();
         if (epicList.containsKey(id)) {
-            System.out.println(epicList.get(id));
             for (Integer num : epicList.get(id).getSubtaskListForEpic().keySet()) {
-                System.out.println(subtaskList.get(num));
+                subtasks.add(subtaskList.get(num));
             }
+            return subtasks;
         } else {
-            System.out.println("Эпика под таким номером нет");
+            throw new IllegalArgumentException("Задачи под таким id не найдено.");
         }
     }
 
@@ -87,7 +121,6 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskList.clear();
     }
 
-    //Переделано) Выглядит действительно более изящно :) Также поправил другие методы, где использовался getClass()
     @Override
     public void deleteTaskById(Integer id) {
         if (allTaskList.containsKey(id)) {
@@ -136,7 +169,7 @@ public class InMemoryTaskManager implements TaskManager {
                     break;
             }
         } else {
-            System.out.println("Задачи под таким номером нет");
+            throw new IllegalArgumentException("Задачи под таким id не найдено");
         }
     }
 
@@ -146,7 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
             switch (allTaskList.get(id).getTypeOfTask()) {
                 case SUBTASK:
                     subtask = new Subtask(name, description, subtaskList.get(id).getIdEpic());
-                    subtask.setId(id);
+                    setAllFieldForTask(subtask, id);
                     subtaskList.put(id, subtask);
                     allTaskList.put(id, subtask);
                     addSubtaskInEpic(subtask, subtaskList.get(id).getIdEpic());
@@ -159,21 +192,26 @@ public class InMemoryTaskManager implements TaskManager {
 
                 case TASK:
                     task = new Task(name, description);
-                    task.setId(id);
+                    setAllFieldForTask(task, id);
                     taskList.put(id, task);
                     allTaskList.put(id, task);
                     taskList.get(id).createNewTask();
                     break;
 
                 case EPIC:
+                    List<Subtask> subtasks = getSubtaskForEpic(id);
                     epic = new Epic(name, description);
-                    epic.setId(id);
+                    epic.setTaskStatus(allTaskList.get(id).getStatus());
+                    setAllFieldForTask(epic, id);
+                    for (Subtask sub : subtasks) {
+                        epic.putSubtaskForEpic(sub);
+                    }
                     epicList.put(id, epic);
                     allTaskList.put(id, epic);
                     break;
             }
         } else {
-            System.out.println("Задачи под атким номером нет");
+            throw new IllegalArgumentException("Задачи под таким id не найдено");
         }
     }
 
@@ -183,8 +221,7 @@ public class InMemoryTaskManager implements TaskManager {
             addTaskInHistory(allTaskList.get(id)); //Просмотренная задача добавляется в список истории
             return allTaskList.get(id);
         } else {
-            System.out.println("Задачи под таким номером нет.");
-            return null;
+            throw new IllegalArgumentException("Задачи под таким id не найдено.");
         }
     }
 
@@ -204,10 +241,10 @@ public class InMemoryTaskManager implements TaskManager {
                     epicList.get(subtaskList.get(id).getIdEpic()).startTask();
                 }
             } else {
-                System.out.println("Статус эпика изменить нельзя");
+                throw new IllegalArgumentException("Статус эпика изменить нельзя");
             }
         } else {
-            System.out.println("Задачи под таким номером нет");
+            throw new IllegalArgumentException("Задачи под таким номером нет");
         }
     }
 
@@ -215,7 +252,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void finishTask(Integer id) {
         if (allTaskList.containsKey(id) && checkStatusTask(id)) {
             if (allTaskList.get(id).getTypeOfTask().equals(Type.EPIC)) {
-                System.out.println("Стаус эпика изменить нельзя");
+                throw new IllegalArgumentException("Стаус эпика изменить нельзя");
             }
             if (allTaskList.get(id).getTypeOfTask().equals(Type.TASK)) {
                 taskList.get(id).finishTask();
@@ -227,7 +264,7 @@ public class InMemoryTaskManager implements TaskManager {
                 }
             }
         } else {
-            System.out.println("Задачи под таким номером нет или над ней не была начата работа");
+            throw new IllegalArgumentException("Задачи под таким номером нет или над ней не была начата работа");
         }
     }
 
@@ -288,28 +325,47 @@ public class InMemoryTaskManager implements TaskManager {
         return subtaskList.get(idLastSubtask).getTaskStatus();
     }
 
-    public void printAllTaskList() {
-        for (Integer id : allTaskList.keySet()) {
-            System.out.println(allTaskList.get(id));
+    private Boolean checkThatTimeIsNotInInterval(String localDataTime, int duration) {
+        LocalDateTime currentDataTime = LocalDateTime.parse(localDataTime, Task.DATE_TIME_FORMATTER);
+        Duration currentDuration = Duration.ofMinutes(duration);
+        for (Task task : getPrioritizedTasks()) {
+            if (task.getStartTime() == null) {
+                return true;
+            }
+            if(task.getTypeOfTask().equals(Type.EPIC)) {
+                continue;
+            }
+            if (currentDataTime.isAfter(task.getStartTime()) &&
+                    currentDataTime.isBefore(task.getEndTime()) ||
+                    currentDataTime.plus(currentDuration).isAfter(task.getStartTime()) &&
+                    currentDataTime.plus(currentDuration).isBefore(task.getEndTime()) ||
+                    currentDataTime.equals(task.getStartTime())
+            ) return false;
         }
+        return true;
     }
 
-    public void printTaskList() {
-        for (Integer id : taskList.keySet()) {
-            System.out.println(taskList.get(id));
-        }
+    private void setAllFieldForTask(Task task, int currentId) {
+        task.setId(currentId);
+        task.setStartTime(allTaskList.get(currentId).getStartTime());
+        task.setDuration(allTaskList.get(currentId).getDuration());
+        task.setEndTime(allTaskList.get(currentId).getEndTime());
     }
 
-    public void printEpicList() {
-        for (Integer id : epicList.keySet()) {
-            System.out.println(epicList.get(id));
-        }
+    public HashMap<Integer, Task> getAllTaskList() {
+        return allTaskList;
     }
 
-    public void printSubtaskList() {
-        for (Integer id : subtaskList.keySet()) {
-            System.out.println(subtaskList.get(id));
-        }
+    public HashMap<Integer, Task> getTaskList() {
+        return taskList;
+    }
+
+    public HashMap<Integer, Epic> getEpicList() {
+        return epicList;
+    }
+
+    public HashMap<Integer, Subtask> getSubtaskList() {
+        return subtaskList;
     }
 
     /* Ниже описан метод для представления task, epic, subtask в виде строки*/

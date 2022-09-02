@@ -1,7 +1,9 @@
 package master;
 
-import java.io.File;
 
+import task.Task;
+
+import java.io.File;
 public class Main {
     public static void main(String[] args) {
 
@@ -13,18 +15,28 @@ public class Main {
         taskManager.createNewSubtask("Собрать вещи", "Не забыть утюг", 1);
         taskManager.createNewSubtask("Сдать ключи", "Встреча с хозяином в 15:30", 1);
         taskManager.createNewSubtask("Посидеть на дорожку", "Прогнать воспоминания в голове", 1);
-        taskManager.createNewEpic("Сделать проект", "Уже спать хочется");
-        //Получаю историю просмотров:
-        taskManager.getTaskById(1);
-        taskManager.getTaskById(3);
-        taskManager.getTaskById(2);
-        //taskManager.printHistoryList();
-        //taskManager.printAllTaskList();
+
+        //Устанавливаю время для подзадач эпика:
+        taskManager.setTimeForTask(3, "17:44 08.05.22", 20);
+        taskManager.setTimeForTask(2, "11:05 08.05.22", 60);
+
+        //Тут будет ошибка, так получится пересечение времени.
+        //taskManager.setTimeForTask(2, "17:54 08.05.22", 60);
+
+        //Устанавливаю время для Task
+        taskManager.setTimeForTask(0, "22:05 08.05.22", 45);
+
+        //Вывожу список задач в приоритете по startTime
+        for(Task task : taskManager.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
 
         //Создаю нового менеджера, восстанавливая данные из файла:
         TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file);
-        taskManager1.printAllTaskList();
-        System.out.println("История просмотров: ");
-        taskManager1.printHistoryList();
+        System.out.println("Приоритетные задачи, восстановленные из файла ");
+        for (Task task : taskManager1.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
+
     }
 }

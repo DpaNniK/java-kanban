@@ -1,9 +1,12 @@
 package master;
 
+import task.Epic;
 import task.Subtask;
 import task.Task;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager { //Интерфейс со всеми методами, которые могут пригодиться при работе с Task
     void createNewTask(String name, String description);
@@ -16,9 +19,13 @@ public interface TaskManager { //Интерфейс со всеми метода
 
     void deleteSubtaskForEpic(Integer idEpic, Subtask subtask);
 
+    void setTimeForTask(int id, String localDateTime, int duration);
+
+    Set<Task> getPrioritizedTasks();
+
     List<Task> getHistory();
 
-    void printSubtaskForEpic(Integer id);
+    List<Subtask> getSubtaskForEpic(Integer id);
 
     void printHistoryList();
 
@@ -36,11 +43,11 @@ public interface TaskManager { //Интерфейс со всеми метода
 
     void finishTask(Integer id);
 
-    void printAllTaskList();
+    HashMap<Integer, Task> getAllTaskList();
 
-    void printTaskList();
+    HashMap<Integer, Task> getTaskList();
 
-    void printEpicList();
+    HashMap<Integer, Epic> getEpicList();
 
-    void printSubtaskList();
+    HashMap<Integer, Subtask> getSubtaskList();
 }

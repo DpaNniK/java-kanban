@@ -4,7 +4,7 @@ import java.io.File;
 
 public class Managers { //Создаю служебный класс
 
-    public static TaskManager getDefault() { //возвращаю объект InMemoryTaskManager
+    public static InMemoryTaskManager getDefault() { //возвращаю объект InMemoryTaskManager
         return new InMemoryTaskManager();
     }
 

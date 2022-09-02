@@ -501,7 +501,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals("Время задачи пересекается с временем выполнения другой задачи", ex.getMessage());
     }
 
-    //Проверка на создание исключения при попытки установить пересекающееся врремя
+    //Проверка на создание исключения при попытки установить пересекающееся время
     @Test
     void shouldReturnErrorForSetStartTimeForTwoEqualsTime() {
         IllegalArgumentException ex = Assertions.assertThrows(

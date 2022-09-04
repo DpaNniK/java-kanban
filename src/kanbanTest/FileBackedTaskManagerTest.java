@@ -18,7 +18,9 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     File file = new File("file.backed.csv");
     File emptyFile = new File("empty.backed.csv");
-    File notFound = new File("C:\\Users\\puhof\\IdeaProjects\\");
+    //Исправил. Здесь переменная File, в которой нет самого файла, чтобы проверить вызов исключения
+    //при попытке считать - записать в несуществующий файл
+    File notFound = new File("");
 
     @BeforeEach
     void beforeEach() {
@@ -29,6 +31,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     @Test
     void testSaveAndRestoreManagerWithEmptyTask() {
         TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(emptyFile);
+
+        assertNotNull(taskManager1, "Ошибка при создании объекта класса FileBackedTaskManager");
 
         assertEquals(0, taskManager1.getAllTaskList().size()
                 , "Восстановленный менеджер не пустой");

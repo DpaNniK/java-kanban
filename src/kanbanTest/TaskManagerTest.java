@@ -18,13 +18,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     T taskManager;
 
-    void createTaskEpicSubtask() {
+    private void createTaskEpicSubtask() {
         taskManager.createNewEpic("epic", "desc");
         taskManager.createNewSubtask("sub", "desc", 0);
         taskManager.createNewTask("task", "desc");
     }
 
-    void createEpicWithSubtask() {
+    private void createEpicWithSubtask() {
         taskManager.createNewEpic("epic", "desc");
         taskManager.createNewSubtask("sub", "desc", 0);
         taskManager.createNewSubtask("sub1", "desc", 0);

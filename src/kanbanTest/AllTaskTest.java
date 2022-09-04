@@ -30,7 +30,7 @@ class AllTaskTest {
     }
 
     //Отдельный метод для создания эпика с добавленной в него подзадачей
-    void createEpicWithSubtask() {
+    private void createEpicWithSubtask() {
         epic.setId(1);
         subtask = new Subtask("subtask", "desc", epic.getId());
         subtask.setId(2);

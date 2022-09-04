@@ -21,6 +21,12 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         inMemoryTaskManager.createNewTask("task", "desc");
 
         assertNotNull(inMemoryTaskManager, "Ошибочное создание объекта класса InMemoryTaskManager");
+
+        InMemoryTaskManager inMemoryTaskManager1 = Managers.getDefault();
+
+        assertNotNull(inMemoryTaskManager1, "Ошибочное создание объекта класса InMemoryTaskManager");
+        assertEquals(0, inMemoryTaskManager1.getAllTaskList().size()
+                ,"Новосозданный объект класса InMemoryTaskManager имеет непустой список задач");
     }
 
 }

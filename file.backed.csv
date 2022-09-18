@@ -1,5 +1,3 @@
 id,type,name,status,description,epic id,start time,duration(min),end time
-0,EPIC,epic,NEW,desc,null,null,null
-1,TASK,task,NEW,desc,null,null,null
-2,SUBTASK,subtask,NEW,desc,0,null,null,null
+0,TASK,epic,NEW,desc,null,null,null
 

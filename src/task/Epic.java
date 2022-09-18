@@ -1,7 +1,6 @@
 package task;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeSet;
@@ -9,7 +8,7 @@ import java.util.TreeSet;
 public class Epic extends Task {
 
     private final HashMap<Integer, Subtask> subtaskListForEpic;
-    Comparator<Task> comparator =  Comparator.comparing(Task::getStartTime
+    transient Comparator<Task> comparator =  Comparator.comparing(Task::getStartTime
             , Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Task::getId);
 
     public Epic(String name, String description) {

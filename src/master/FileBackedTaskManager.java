@@ -15,8 +15,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     File file;
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yy");
 
-    public FileBackedTaskManager(File file) {
-        this.file = file;
+    public FileBackedTaskManager(String path) {
+        this.file = new File(path);
     }
 
     public void save() throws ManagerSaveException {
@@ -37,7 +37,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 InMemoryHistoryManager.historyToString(historyManager));
     }
 
-    public Task fromString(String value) {
+    private Task fromString(String value) {
         String[] str = value.split(",");
         switch (str[1]) {
             case "TASK":
@@ -54,9 +54,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return subtask;
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
+    public static FileBackedTaskManager loadFromFile(String patch) {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(patch);
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(patch, StandardCharsets.UTF_8))) {
             bufferedReader.readLine();
             while (bufferedReader.ready()) {
                 String line = bufferedReader.readLine();
@@ -112,7 +112,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     //Метод восстановления полей в зависимости от типа задачи
-    public void loadTaskFromString(Task task, String[] str) {
+    private void loadTaskFromString(Task task, String[] str) {
         switch (task.getTypeOfTask()){
             case TASK:
                 task.setTaskStatus(getStatusFromString(str[3]));
@@ -158,7 +158,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     //Присвоение полей для новой задачи, полученных чтением файла
-    public void createTaskFromFile(Task newTask, Task oldTask) {
+    private void createTaskFromFile(Task newTask, Task oldTask) {
         newTask.setTaskStatus(oldTask.getTaskStatus());
         newTask.setStartTime(oldTask.getStartTime());
         newTask.setDuration(oldTask.getDuration());

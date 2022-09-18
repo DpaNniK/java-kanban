@@ -18,9 +18,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     File file = new File("file.backed.csv");
     File emptyFile = new File("empty.backed.csv");
-    //Исправил. Здесь переменная File, в которой нет самого файла, чтобы проверить вызов исключения
-    //при попытке считать - записать в несуществующий файл
-    File notFound = new File("");
+     File notFound = new File("");
 
     @BeforeEach
     void beforeEach() {
@@ -30,7 +28,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     //Тестирование восстановления пустого менеджера
     @Test
     void testSaveAndRestoreManagerWithEmptyTask() {
-        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(emptyFile);
+        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(emptyFile.getPath());
 
         assertNotNull(taskManager1, "Ошибка при создании объекта класса FileBackedTaskManager");
 
@@ -51,7 +49,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         taskManager.createNewEpic("epic2", "desc");
         taskManager.getTaskById(1);
 
-        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file);
+        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file.getPath());
 
         assertEquals(taskManager.getEpicList().size(), taskManager1.getEpicList().size()
                 , "Эпики не восстановились в новом менеджере");
@@ -66,7 +64,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         taskManager.createNewTask("task", "desc");
         taskManager.createNewSubtask("subtask", "desc", 0);
 
-        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file);
+        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file.getPath());
 
         assertNotNull(taskManager1.getEpicList()
                 , "Не восстановились эпики предыдущего менеджера");
@@ -100,12 +98,12 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     //Генерация Executable для записи в несуществующий файл
     private Executable generateExecutableForSaveManagerInFile() {
-        TaskManager taskManager1 = new FileBackedTaskManager(notFound);
+        TaskManager taskManager1 = new FileBackedTaskManager(" ");
         return () -> taskManager1.createNewTask("task", "desc");
     }
 
     //Генерация Executable для восстановления менеджера из несуществующего файла
     private Executable generateExecutableForLoadManageFromFile() {
-        return () -> FileBackedTaskManager.loadFromFile(notFound);
+        return () -> FileBackedTaskManager.loadFromFile(notFound.getPath());
     }
 }

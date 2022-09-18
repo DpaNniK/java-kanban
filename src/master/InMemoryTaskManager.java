@@ -368,6 +368,10 @@ public class InMemoryTaskManager implements TaskManager {
         return subtaskList;
     }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     /* Ниже описан метод для представления task, epic, subtask в виде строки*/
     protected String allTaskToString() {
         StringBuilder stringBuilder = new StringBuilder();

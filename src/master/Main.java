@@ -1,42 +1,51 @@
 package master;
 
 
+import com.google.gson.Gson;
+import httpResourse.GsonCreate;
+import httpResourse.HTTPTaskServer;
+import httpResourse.KVServer;
 import task.Task;
 
-import java.io.File;
-public class Main {
-    public static void main(String[] args) {
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-        File file = new File("file.backed.csv");
-        TaskManager taskManager = Managers.getFileBackedManager(file);
-        //Создаю задачи:
+public class Main {
+    public static void main(String[] args) throws IOException {
+        String port = "8080";
+        KVServer kvServer = new KVServer();
+        kvServer.start();
+        TaskManager taskManager = Managers.getHTTPTaskManager(port);
         taskManager.createNewTask("Помыть машину", "Заехать на мойку в 20:00");
         taskManager.createNewEpic("Переехать", "Нужно собрать вещи и сдать ключи");
         taskManager.createNewSubtask("Собрать вещи", "Не забыть утюг", 1);
-        taskManager.createNewSubtask("Сдать ключи", "Встреча с хозяином в 15:30", 1);
-        taskManager.createNewSubtask("Посидеть на дорожку", "Прогнать воспоминания в голове", 1);
+        taskManager.createNewTask("newTask", "Task");
+        taskManager.setTimeForTask(2, "17:44 08.05.22", 20);
+        taskManager.getTaskById(1);
+        taskManager.getTaskById(0);
 
-        //Устанавливаю время для подзадач эпика:
-        taskManager.setTimeForTask(3, "17:44 08.05.22", 20);
-        taskManager.setTimeForTask(2, "11:05 08.05.22", 60);
+        TaskManager taskManager1 = HTTPTaskManager.loadFromServer(port);
+        taskManager1.createNewTask("а", "б");
+        taskManager1.printHistoryList();
+        kvServer.stop();
 
-        //Тут будет ошибка, так получится пересечение времени.
-        //taskManager.setTimeForTask(2, "17:54 08.05.22", 60);
+        /*
+        Тестирование работы KVServer
+        Gson gson = GsonCreate.createGson();
+        TaskManager taskManager = Managers.getDefault();
+        taskManager.createNewTask("Помыть машину", "Заехать на мойку в 20:00");
+        taskManager.createNewEpic("Переехать", "Нужно собрать вещи и сдать ключи");
+        taskManager.createNewSubtask("Собрать вещи", "Не забыть утюг", 1);
 
-        //Устанавливаю время для Task
-        taskManager.setTimeForTask(0, "22:05 08.05.22", 45);
+        new KVServer().start();
+        KVTaskClient kvTaskClient = new KVTaskClient("8080");
 
-        //Вывожу список задач в приоритете по startTime
-        for(Task task : taskManager.getPrioritizedTasks()) {
-            System.out.println(task);
-        }
+        kvTaskClient.put("tasks", gson.toJson(taskManager.getTaskList()));
 
-        //Создаю нового менеджера, восстанавливая данные из файла:
-        TaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file);
-        System.out.println("Приоритетные задачи, восстановленные из файла ");
-        for (Task task : taskManager1.getPrioritizedTasks()) {
-            System.out.println(task);
-        }
+        kvTaskClient.load("tasks"); */
 
     }
 }

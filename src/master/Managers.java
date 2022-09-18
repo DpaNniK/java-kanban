@@ -13,6 +13,10 @@ public class Managers { //Создаю служебный класс
     }
 
     public static TaskManager getFileBackedManager(File file) {
-        return new FileBackedTaskManager(file);
+        return new FileBackedTaskManager(file.getPath());
+    }
+
+    public static HTTPTaskManager getHTTPTaskManager(String port) {
+        return new HTTPTaskManager(port);
     }
 }
